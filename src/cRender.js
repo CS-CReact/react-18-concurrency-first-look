@@ -18,10 +18,25 @@ const reconciler = ReactReconciler({
     hostContext,
     internalInstanceHandle
   ) => {
-    // console.log(type, props);
+    //console.log(type, props);
     console.log('Fiber: ', internalInstanceHandle);
+    
+    // let lanes = []
+    // let fiber = internalInstanceHandle; 
+    // let count = 0
+    // while (fiber && count < 10) {
+    //   if (fiber.lanes !== null ) {
+    //     lanes.push(fiber.lanes)
+    //     if(fiber.lanes !== 0) console.log("We found a special lane: ", fiber.lanes)
+    //   }
+    //   fiber = fiber.return;
+    //   count++;
+    // }
+    // console.log("Lanes: ", lanes)
+    
     const element = document.createElement(type);
 
+    //TODO: simplify this, using a loop over props (Object.keys(props)) or something
     element.className = props.className || '';
 
     // check if the prop has incline styles; if yes, add the style to element
@@ -38,6 +53,11 @@ const reconciler = ReactReconciler({
     if (props.onClick) {
       element.addEventListener('click', props.onClick);
     }
+    if (props.onChange) {
+      element.addEventListener('keyup', props.onChange)
+    }
+
+    if (props.id) element.id = props.id; 
 
     if (props.src) element.src = props.src;
     if (type === 'button') element.style.borderColor = 'red';
@@ -45,6 +65,11 @@ const reconciler = ReactReconciler({
     // check if has suspense ancestor
     if (suspenseAncestor(internalInstanceHandle))
       element.style.backgroundColor = '#E0FFFF';
+
+    //test waiting before returning
+    // setTimeout(() => {
+    //   console.log("Delayed for 1 second.");
+    // }, 3000)
 
     return element;
   },
@@ -111,6 +136,7 @@ const reconciler = ReactReconciler({
   shouldDeprioritizeSubtree: (type, nextProps) => {
     return !nextProps.hidden;
   },
+  detachDeletedInstance: () => {}, 
   supportsMutation: true,
 });
 
