@@ -10,3 +10,8 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// const root = document.getElementById('root') as HTMLElement
+//  cRender(<React.StrictMode>
+//     <App />
+//     </React.StrictMode>, root)
