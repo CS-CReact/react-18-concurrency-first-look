@@ -1,8 +1,8 @@
 function ProductList({ products }) {
   return (
     <ul>
-      {products.map((product, i) => (
-        <li key = {i + 1}>{product}</li>
+      {products.map((product) => (
+        <li className ="DoNotInspect" key = {product.id}>{product.name}</li>
       ))}
     </ul>
   );

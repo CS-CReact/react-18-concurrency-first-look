@@ -15,27 +15,77 @@ const isSuspense = (fiber) => {
   return false;
 };
 
-const isTransition = (fiber) => {
-  let count = 0; 
-  let lanes = []
-  while (fiber && count < 10) {
+const getLaneNum = (fiber) => {
+    let count = 0; 
+  //let lanes = []
+  while (fiber && count < 5) {
     if (fiber.lanes !== null ) {
-      const laneNum = fiber.lanes; 
-      lanes.push(fiber.lanes)
+      const laneNum = Math.log2(fiber.lanes); 
+      //lanes.push(fiber.lanes)
       //TODO: clean this logic; 
       //make the lanes more fine grained; a color for a type of lane; a shade for a specific lane of that type 
       //probably will need bitwise operatitions
-      if(Math.log2(laneNum) >= 6 && Math.log2(laneNum) <= 22) {
+      if(laneNum > -Infinity) {
         console.log(`We found a special lane: ${laneNum} in ancestor ${count}`); 
-        return true; 
+        return laneNum; 
       }
     }
     fiber = fiber.return;
     count++;
   }
-  //console.log("Lanes: ", lanes)
-  return false; 
+  return 0; 
+
 }
+
+const isTransition = (laneNum) => {
+    return laneNum >= 6 && laneNum <= 22
+}
+
+
+const setTransitionColor = (laneNum) => {
+    switch(laneNum) {
+        case 6: 
+            return "#99e2b4"; 
+        case 7: 
+            return "#88d4dB"; 
+        case 8: 
+            return "#9ff7cb"; 
+        case 9: 
+            return "#67b99a"; 
+        case 10: 
+            return "#56ab91"; 
+        case 11: 
+            return "#469d89"; 
+        case 12: 
+            return "#358f80";
+        case 13: 
+            return "#248277"; 
+        case 14: 
+            return "#14746f";
+        case 15: 
+            return "#036666";
+        case 16: 
+            return "#40916c"; 
+        case 17: 
+            return "#25a244";
+        case 18: 
+            return "#208b3a";
+        case 19: 
+            return "#1a7431";
+        case 20: 
+            return "#155d27";
+        case 21: 
+            return "#10451d"; 
+        case 22: 
+            return "#2d6a4f"; 
+        
+        default: 
+            return "#2d6a4f"; 
+        
+    }
+
+}
+
 
 const reconciler = ReactReconciler({
   createInstance: (
@@ -45,8 +95,8 @@ const reconciler = ReactReconciler({
     hostContext,
     internalInstanceHandle
   ) => {
-    console.log(type, props);
-    //console.log('Fiber: ', internalInstanceHandle);
+    //console.log(type, props);
+    console.log('Fiber: ', internalInstanceHandle);
     
    
     const element = document.createElement(type);
@@ -55,13 +105,17 @@ const reconciler = ReactReconciler({
 
     if (props.id === 'app') {
       const header = document.createElement('h1'); 
-      header.innerText = 'Boohaha C-renderer!';
-      header.style.color = "yellow"; 
-      element.prepend(header)
+      const container = document.createElement('div'); 
+      header.innerText = 'Rendered by C-React';
+      header.style.color = "#0077B6"; 
+      header.style.font = 'bold 25px impact,serif'
+      container.style.backgroundColor = '#E9C46A'
+      container.style.border = 'solid black';
+      container.style.marginBottom = '20px'; 
+      container.appendChild(header);
+      element.prepend(container)
       
     }
-
-
 
 
     //TODO: simplify this, using a loop over props (Object.keys(props)) or something
@@ -93,9 +147,10 @@ const reconciler = ReactReconciler({
       element.style.backgroundColor = '#E0FFFF';
 
     //check if has useTransition ancestor
-    if (isTransition(internalInstanceHandle)) {
-      element.style.backgroundColor = "#66ff99";
-      element.classList.add('c-Transition');  
+    const laneNum = getLaneNum(internalInstanceHandle); 
+    if (isTransition(laneNum)) {
+      element.style.backgroundColor = setTransitionColor(laneNum);
+      element.classList.add('TransitionLane'+ (laneNum - 6));  
     }
 
     return element;
@@ -145,7 +200,14 @@ const reconciler = ReactReconciler({
     newProps,
     rootContainer,
     hostContext
-  ) => {},
+  ) => {
+    // console.log("Prepare Update");
+    // console.log("Old Props", oldProps); 
+    // console.log("New Props", newProps)
+    // console.log("rootContainer", rootContainer);
+    // console.log("hostContext", hostContext); 
+    return; 
+  },
   commitUpdate: (
     instance,
     updatePayload,
@@ -153,7 +215,14 @@ const reconciler = ReactReconciler({
     prevProps,
     nextProps,
     internalHandle
-  ) => {},
+  ) => {
+    console.log("Commit Update"); 
+    console.log("instanceHandle", internalHandle); 
+    if (isTransition(internalHandle)) {
+      instance.style.backgroundColor = "#66ff99";
+      instance.classList.add('c-Transition');  
+    }
+  },
   commitTextUpdate: (textInstance, oldText, newText) => {
     textInstance.nodeValue = newText;
   },
@@ -165,12 +234,13 @@ const reconciler = ReactReconciler({
   detachDeletedInstance: () => {}, 
   getCurrentEventPriority: ()=> {
     //TODO:understand what these mean and if they are useful
-    //obveration: the 3 values are different but remain constant through updates [1, 4, 16] 
-    // console.log([DiscreteEventPriority,
-    //   ContinuousEventPriority,
-    //   DefaultEventPriority]); 
+    //current obsveration: the 3 values are different but remain constant through updates [1, 4, 16] 
+    console.log([DiscreteEventPriority,
+      ContinuousEventPriority,
+      DefaultEventPriority]); 
     return DefaultEventPriority 
   },
+  commitMount: (instace, type, props, internalInstanceHandle)=> {console.log("Commit Mount ", internalInstanceHandle)},
   supportsMutation: true,
 });
 

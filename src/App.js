@@ -9,7 +9,7 @@ function filterProducts(filterTerm) {
   if (!filterTerm) {
     return dummyProducts;
   }
-  return dummyProducts.filter((product) => product.includes(filterTerm));
+  return dummyProducts.filter((product) => product.name.includes(filterTerm));
 }
 
 function App() {
