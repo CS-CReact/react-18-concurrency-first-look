@@ -7,7 +7,7 @@ import {
 
 const isSuspense = (fiber) => {
   let count = 0;
-  while (fiber.return && count < 5) {
+  while (fiber.return && count < 3) {
     fiber = fiber.return;
     count++;
     if (fiber.tag === 13) return true;
@@ -18,7 +18,7 @@ const isSuspense = (fiber) => {
 const getLaneNum = (fiber) => {
     let count = 0; 
   //let lanes = []
-  while (fiber && count < 5) {
+  while (fiber && count < 10) {
     if (fiber.lanes !== null ) {
       const laneNum = Math.log2(fiber.lanes); 
       //lanes.push(fiber.lanes)
@@ -26,7 +26,7 @@ const getLaneNum = (fiber) => {
       //make the lanes more fine grained; a color for a type of lane; a shade for a specific lane of that type 
       //probably will need bitwise operatitions
       if(laneNum > -Infinity) {
-        console.log(`We found a special lane: ${laneNum} in ancestor ${count}`); 
+       // console.log(`We found a special lane: ${laneNum} in ancestor ${count}`); 
         return laneNum; 
       }
     }
@@ -95,9 +95,6 @@ const reconciler = ReactReconciler({
     hostContext,
     internalInstanceHandle
   ) => {
-    //console.log(type, props);
-    console.log('Fiber: ', internalInstanceHandle);
-    
    
     const element = document.createElement(type);
 
@@ -114,6 +111,8 @@ const reconciler = ReactReconciler({
       container.style.marginBottom = '20px'; 
       container.appendChild(header);
       element.prepend(container)
+      //console.log("Unsuspended fiber", internalInstanceHandle);
+
       
     }
 
@@ -138,19 +137,36 @@ const reconciler = ReactReconciler({
     }
 
     if (props.id) element.id = props.id; 
+    if (props.placeholder) element.placeholder = props.placeholder; 
 
     if (props.src) element.src = props.src;
-    if (type === 'button') element.style.borderColor = 'red';
+
+    //for demo only. No use in production
+    if (type === 'button') {
+        element.style.borderColor = 'red'; 
+        element.style.width = '160px'; 
+        element.style.height = '100px';
+        element.style.fontSize = 'xx-large'; 
+    };
 
     // check if has suspense ancestor
-    if (isSuspense(internalInstanceHandle))
-      element.style.backgroundColor = '#E0FFFF';
+    if (isSuspense(internalInstanceHandle)) {
+        element.style.border = 'solid lightblue'; 
+        element.classList.add('Suspense'); 
+        //this is purely for fun; *may* be useful for future   
+        const tooltip = document.createElement('span'); 
+        tooltip.innerHTML = '&#128570 Phew! It took me 1223ms to load!';
+        tooltip.className = 'SuspensePopup'; 
+        element.appendChild(tooltip); 
+       // console.log("Suspended fiber", internalInstanceHandle);
+    }
+    //   element.style.backgroundColor = '#E0FFFF';
 
     //check if has useTransition ancestor
     const laneNum = getLaneNum(internalInstanceHandle); 
     if (isTransition(laneNum)) {
       element.style.backgroundColor = setTransitionColor(laneNum);
-      element.classList.add('TransitionLane'+ (laneNum - 6));  
+      element.classList.add('TransitionLane'+ (laneNum - 6));
     }
 
     return element;
@@ -235,11 +251,14 @@ const reconciler = ReactReconciler({
   getCurrentEventPriority: ()=> {
     //TODO:understand what these mean and if they are useful
     //current obsveration: the 3 values are different but remain constant through updates [1, 4, 16] 
-    console.log([DiscreteEventPriority,
-      ContinuousEventPriority,
-      DefaultEventPriority]); 
+    // console.log([DiscreteEventPriority,
+    //   ContinuousEventPriority,
+    //   DefaultEventPriority]); 
     return DefaultEventPriority 
   },
+  hideInstance: ()=> {},
+  //This is needed for demo supsense; not sure why-- may have to with promise and simulated delay
+  unhideInstance: ()=> {},
   commitMount: (instace, type, props, internalInstanceHandle)=> {console.log("Commit Mount ", internalInstanceHandle)},
   supportsMutation: true,
 });

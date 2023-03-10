@@ -1,37 +1,29 @@
-import { useState, useTransition } from 'react';
+import { useState, useTransition, Suspense } from 'react';
 
-import { generateProducts } from './data';
+//import { generateProducts } from './data';
 import ProductList from './components/ProductList';
+import SuspenseContainer from './components/SuspenseContainer';
 
-const dummyProducts = generateProducts();
 
-function filterProducts(filterTerm) {
-  if (!filterTerm) {
-    return dummyProducts;
-  }
-  return dummyProducts.filter((product) => product.name.includes(filterTerm));
-}
+
 
 function App() {
-  const [isPending, startTransition] = useTransition();
-  const [filterTerm, setFilterTerm] = useState('');
 
-  const filteredProducts = filterProducts(filterTerm);
+  const [show, setShow] = useState(false); 
 
-  function updateFilterHandler(event) {
-    startTransition(() => {
-      setFilterTerm(event.target.value);
-    });
-    setFilterTerm(event.target.value);
-  }
-
-  return (
-    <div id="app">
-      <input type="text" onChange={updateFilterHandler} />
-      {/* {isPending && <p style={{color: 'white'}}>Updating List...</p>} */}
-      <ProductList products={filteredProducts} />
-    </div>
-  );
+  if(show) {
+    return (
+      <div id="app">
+        {/* <input type="text" onChange={updateFilterHandler} /> */}
+        {/* {isPending && <p style={{color: 'white'}}>Updating List...</p>} */}
+        <SuspenseContainer />
+        
+      </div>
+    );
+  } else {
+      return (
+      <button onClick = {() => setShow(true)}>Demo</button>
+  )}
 }
 
 export default App;
