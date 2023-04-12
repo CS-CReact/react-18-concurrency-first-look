@@ -15,8 +15,22 @@ function ProductList() {
     setFilterTerm(event.target.value);
   }
 
+  //for suspense and delay
+  //const products = use(fetchData('products')); 
+
+  function generateProducts() {
+    const products = [];
+    for (let i = 0; i < 30; i++) {
+      products.push({
+        name: `Product ${i+1}`,
+        id: i+1
+      });
+    }
   
-  const products = use(fetchData('products')); 
+    return products;
+  }
+  
+  const products = generateProducts(); 
 
   function filterProducts(filterTerm) {
    
