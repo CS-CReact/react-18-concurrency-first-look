@@ -7,14 +7,21 @@ import {
 import createDOMElement,{setStyles,isEvent} from  './createDOMelement'
 
 //shallow diff algorithm from react-tiny-dom
-
+//shallow so the event handler functions are treated as different===>not exactly sure why; definitely have to do with shallowness
 function shallowDiff(oldProps, newProps) {
   // Return a diff between the new and the old object
+  
   const uniqueProps = new Set([...Object.keys(oldProps), ...Object.keys(newProps)]);
   const changedProps = Array.from(uniqueProps).filter(
-    propKey => oldProps[propKey] !== newProps[propKey]
+    //maybe add some logic to handle cases where the the probs are deeply identical
+    
+    propKey => {
+      if (typeof oldProps[propKey] === 'function' && typeof newProps[propKey] === 'function') {
+        return oldProps[propKey].toString() !== newProps[propKey].toString();
+      } else return oldProps[propKey] !== newProps[propKey]
+    }
   );
-  return changedProps;
+  if (changedProps.length !== 0) return changedProps;
 }
 
 
@@ -167,7 +174,7 @@ const reconciler = ReactReconciler({
     // console.log("New Props", newProps)
     // console.log("rootContainer", rootContainer);==> the div with id "root"
     // console.log("hostContext", hostContext); ==> not sure; undefined 
-    return //shallowDiff(oldProps, newProps); 
+    return shallowDiff(oldProps, newProps); 
   },
   commitUpdate: (
     domElement,
@@ -243,6 +250,8 @@ const reconciler = ReactReconciler({
   
   commitMount: (instace, type, props, internalInstanceHandle)=> {console.log("Commit Mount ", internalInstanceHandle)},
   supportsMutation: true,
+  supportsHydration: true,
+  hydrateInstance: ()=> {},
 });
 
 const cRender = (element, container) => {

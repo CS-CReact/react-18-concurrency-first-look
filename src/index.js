@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import cRender from './cRender.js'
+import cRender from './cRender'
 import './index.css';
 import App from './App';
 

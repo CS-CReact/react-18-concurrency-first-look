@@ -49,7 +49,7 @@ function ProductList() {
         <input type='text' placeholder= "useTransition demo..." onChange={updateFilterHandler} />
           <ul>
             {filteredProducts.map((product) => (
-              <li className ="DoNotInspect" key = {product.id}>
+              <li  key = {product.id}>
                 {product.name}
               </li>))
               }

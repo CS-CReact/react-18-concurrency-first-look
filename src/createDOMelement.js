@@ -65,19 +65,19 @@ export default function createDomElement(
     if (isSuspense(internalInstanceHandle)) {
         element.style.border = 'solid lightblue'; 
         element.classList.add('Suspense'); 
-        //this is purely for fun; *may* be useful for future   
-        const tooltip = document.createElement('span'); 
-        tooltip.innerHTML = '&#128570 Phew! It took me 1223ms to load!';
-        tooltip.className = 'SuspensePopup'; 
-        element.appendChild(tooltip); 
-       // console.log("Suspended fiber", internalInstanceHandle);
+    //     //this is purely for fun; *may* be useful for future   
+    //     const tooltip = document.createElement('span'); 
+    //     tooltip.innerHTML = '&#128570 Phew! It took me 1223ms to load!';
+    //     tooltip.className = 'SuspensePopup'; 
+    //     element.appendChild(tooltip); 
+    //    // console.log("Suspended fiber", internalInstanceHandle);
     }
 
     //check if has useTransition ancestor
     const laneNum = getLaneNum(internalInstanceHandle); 
     if (isTransition(laneNum)) {
       element.style.backgroundColor = setTransitionColor(laneNum);
-      element.classList.add('TransitionLane'+ (laneNum - 6));
+      element.classList.add('TransitionLane'+ (laneNum));
     }
 
     return element;
