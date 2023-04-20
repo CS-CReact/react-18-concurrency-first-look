@@ -18,6 +18,9 @@ export default function createDomElement(
   ) {
    
     const element = document.createElement(type);
+    console.log(element)
+    //console.log(internalInstanceHandle.actualDuration.toFixed(2)); 
+    element.setAttribute("loadtime", internalInstanceHandle.actualDuration.toFixed(2)); 
 
     for (const [propKey, propValue] of Object.entries(props)) { 
         if (propKey === "children") continue; 
