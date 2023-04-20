@@ -11,7 +11,7 @@ function App() {
 
   const [show, setShow] = useState(false); 
 
-  if(show) {
+  if(true) {
     return (
       <div id="app">
         {/* <input type="text" onChange={updateFilterHandler} /> */}
